@@ -21,7 +21,7 @@ namespace WebApi.Controllers
             now -= now.TimeOfDay;
         }
 
-        [HttpGet]
+        [HttpGet("{startDay; endDay}")]
         public IActionResult GetScheduler(DateTime? startDay = null, DateTime? endDay = null)
         {
             if (startDay == null)
@@ -59,6 +59,15 @@ namespace WebApi.Controllers
             if (dayOfBusy == null) return NotFound();
 
             return Ok(dayOfBusy);
+        }
+
+        [HttpGet("{startTime; endTime}")]
+        public IActionResult GetDayFromRangeTime(TimeSpan startTime, TimeSpan endTime)
+        {
+            if (startTime >= endTime)
+                return BadRequest();
+
+            return Ok(db.DaysOfBusy.Where(x => x.TimeOfBusy >= startTime && x.TimeOfBusy <= endTime));
         }
 
         [HttpPost]

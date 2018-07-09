@@ -7,18 +7,13 @@
 <head>
     <meta charset="utf-8" />
     <title></title>
-    <meta name="keywords" content="" />
-    <meta name="description" content="" />
-
-    <link rel="stylesheet" href="~/css/site.css" />
-    
+    <link href="~/css/site.css?v=@DateTime.Now.Millisecond" rel="stylesheet" />
 </head>
 
 <body>
     <header class="header">
         Бронирование переговорных
-    </header><!-- .header-->
-    @*<div class="wrapper">*@
+    </header>
     <main class="content">
         <br />
         <p>Чтобы забронировать переговорную, выберите дату.</p>
@@ -45,11 +40,11 @@
                         {
                             @if (j < 6)
                             {
-                                <td id="td2" style="background: linear-gradient(#F0FFF0,#ffffff)" title="есть ли свободные переговорные"> <a href="#openModal">@j</a> </td>
+                                <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff)" title="  "> <a href="#openModal">@j</a> </td>
                             }
                             else
                             {
-                                <td id="td2" style="background: linear-gradient(#FFE4E1,	#ffffff); border-color: #fa9e9e"  title="есть ли свободные переговорные"><a href="#openModal">@j</a></td>
+                                <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@j</a></td>
                             }
                         }
                     </tr>
@@ -63,15 +58,12 @@
                 </div>
             </tbody>
         </table>
-
-
         <p class="bottom-img"><img src="~/images/bottom.png"></p>
-    </main><!-- .content -->
-    @*</div>*@<!-- .wrapper -->
+    </main>
 
     <footer class="footer">
         2018 - Практика в ММТР
-    </footer><!-- .footer -->
+    </footer>
 
 </body>
 </html>

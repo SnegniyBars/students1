@@ -79,6 +79,7 @@ p, h2 {
     margin-top: 0px;
     text-align: center;
 }
+
 .footer {
     padding: 1%;
     background: #814169 no-repeat left;
@@ -111,7 +112,7 @@ p, h2 {
 .modalDialog:target {
         display: block;
         pointer-events: auto;
-    }
+}
 
 .modalDialog > div {
         width: 400px;
@@ -123,7 +124,7 @@ p, h2 {
         background: -moz-linear-gradient(#fff, #999);
         background: -webkit-linear-gradient(#fff, #999);
         background: -o-linear-gradient(#fff, #999);
-}
+    }
 
 .close {
     background: #606061;
