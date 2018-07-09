@@ -11,19 +11,19 @@ namespace WebApi.Controllers
     [Route("api/calendar")]
     public class CalendarController : Controller
     {
-        DateTime now = DateTime.Now;
         StudentsContext db;
-        long oneDay = (new DateTime(1, 1, 2)).Ticks;
 
         public CalendarController(StudentsContext context)
         {
             db = context;
-            now -= now.TimeOfDay;
         }
 
-        [HttpGet("{startDay; endDay}")]
+        [HttpGet("/getscheduler")]
         public IActionResult GetScheduler(DateTime? startDay = null, DateTime? endDay = null)
         {
+            DateTime now = DateTime.Now; now -= now.TimeOfDay;
+            long oneDay = (new DateTime(1, 1, 2)).Ticks;
+
             if (startDay == null)
                 startDay = new DateTime(now.Ticks - 14 * oneDay);
 
@@ -49,7 +49,7 @@ namespace WebApi.Controllers
             return Ok(weeks);
         }
 
-        [HttpGet("{date; idRoom; tBusy}")]
+        [HttpGet("/getday")]
         public IActionResult GetDay(DateTime date, int idRoom, TimeSpan tBusy)
         {
             DayOfBusy dayOfBusy = db.DaysOfBusy.FirstOrDefault(x => x.Date == date
@@ -61,8 +61,8 @@ namespace WebApi.Controllers
             return Ok(dayOfBusy);
         }
 
-        [HttpGet("{startTime; endTime}")]
-        public IActionResult GetDayFromRangeTime(TimeSpan startTime, TimeSpan endTime)
+        [HttpGet("/getdaysfromtimerange")]
+        public IActionResult GetDaysFromTimeRange(TimeSpan startTime, TimeSpan endTime)
         {
             if (startTime >= endTime)
                 return BadRequest();
@@ -104,12 +104,12 @@ namespace WebApi.Controllers
             return Ok(dayOfBusy);
         }
 
-        [HttpDelete("{date; idRoom; tBusy;}")]
-        public IActionResult Delete(DateTime date, int idRoom, TimeSpan tBusy)
+        [HttpDelete]
+        public IActionResult Delete(DayOfBusy item)
         {
-            DayOfBusy dayOfBusy = db.DaysOfBusy.FirstOrDefault(x => x.Date == date
-                                                                    && x.IdRoom == idRoom
-                                                                    && x.TimeOfBusy == tBusy);
+            DayOfBusy dayOfBusy = db.DaysOfBusy.FirstOrDefault(x => x.Date == item.Date
+                                                                    && x.IdRoom == item.IdRoom
+                                                                    && x.TimeOfBusy == item.TimeOfBusy);
 
             if (dayOfBusy == null) return NotFound("Day not found!");
 
