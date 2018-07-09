@@ -11,51 +11,64 @@ namespace WebApi.Controllers
     [Route("api/calendar")]
     public class CalendarController : Controller
     {
-        List<List<DateTime>> weeks = new List<List<DateTime>>();
         DateTime now = DateTime.Now;
         StudentsContext db;
-        long oneDay;
-
+        long oneDay = (new DateTime(1, 1, 2)).Ticks;
 
         public CalendarController(StudentsContext context)
         {
             db = context;
-            DateTime a = new DateTime(),
-                     b = new DateTime(1, 1, 2);
-            oneDay = b.Subtract(a).Ticks;
+            now -= now.TimeOfDay;
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult GetScheduler(DateTime? startDay = null, DateTime? endDay = null)
         {
-            if (startDay == null) startDay = new DateTime((DateTime.Now - DateTime.Now.TimeOfDay).Ticks - 14 * oneDay);
+            if (startDay == null)
+                startDay = new DateTime(now.Ticks - 14 * oneDay);
 
-            //if (endDay == null) startDay = new DateTime((DateTime.Now - DateTime.Now.TimeOfDay).Ticks + 14 * oneDay);
+            if (endDay == null)
+                endDay = new DateTime(now.Ticks + 14 * oneDay);
 
-            for (int i = 0; i < 5; i++)
+            List<DayOfBusy> weeks = new List<DayOfBusy>();
+            long date = startDay.Value.Ticks;
+
+            while (date <= endDay.Value.Ticks)
             {
-                weeks.Add(new List<DateTime>());
+                List<DayOfBusy> dayInDb = db.DaysOfBusy.Where(x => x.Date.Ticks == date).ToList();
 
-                for (int j = 0; j < 7; j++)
-                    weeks[i].Add(new DateTime(startDay.Value.Ticks + oneDay));
+                if (dayInDb.Count > 0)
+                    for (int j = 0; j < dayInDb.Count; j++)
+                        weeks.Add(dayInDb[j]);
+                else
+                    weeks.Add(new DayOfBusy { Date = new DateTime(date) });
+
+                date += oneDay;
             }
 
             return Ok(weeks);
         }
 
-        [HttpGet("{day; month; year}")]
-        public IActionResult GetDay(int day, int month, int year)
+        [HttpGet("{date; idRoom; tBusy}")]
+        public IActionResult GetDay(DateTime date, int idRoom, TimeSpan tBusy)
         {
-            DateTime date = new DateTime(year, month, day);
+            DayOfBusy dayOfBusy = db.DaysOfBusy.FirstOrDefault(x => x.Date == date
+                                                                    && x.IdRoom == idRoom
+                                                                    && x.TimeOfBusy == tBusy);
 
-            return Ok(date);
+            if (dayOfBusy == null) return NotFound();
+
+            return Ok(dayOfBusy);
         }
 
         [HttpPost]
         public IActionResult Post([FromBody]DayOfBusy dayOfBusy)
         {
             if (db.DaysOfBusy.FirstOrDefault(x => x == dayOfBusy) != null)
-                return BadRequest();
+                return BadRequest("Day already exists!");
+
+            if (db.MeetingRooms.Find(dayOfBusy.IdRoom) == null)
+                return NotFound("Meeting room not found!");
 
             db.DaysOfBusy.Add(dayOfBusy);
             db.SaveChanges();
@@ -63,24 +76,33 @@ namespace WebApi.Controllers
             return Ok(dayOfBusy);
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Put([FromBody]DayOfBusy dayOfBusy)
+        [HttpPut]
+        public IActionResult Update([FromBody]DayOfBusy dayOfBusy)
         {
-            if (db.DaysOfBusy.FirstOrDefault(x => x == dayOfBusy) == null)
-                return BadRequest();
+            if (db.DaysOfBusy.FirstOrDefault(x => x == dayOfBusy) != null)
+                return Ok(dayOfBusy);
 
-            db.DaysOfBusy.Update(dayOfBusy);
+            DayOfBusy day = db.DaysOfBusy.FirstOrDefault(x => x.Date == dayOfBusy.Date
+                                                                        && x.IdRoom == dayOfBusy.Id
+                                                                        && x.TimeOfBusy == dayOfBusy.TimeOfBusy);
+
+            if ( day == null) return NotFound("Day not found!");
+
+            day = dayOfBusy;
+            db.DaysOfBusy.Update(day);
             db.SaveChanges();
 
             return Ok(dayOfBusy);
         }
 
-        [HttpDelete("{id}")]
-        public IActionResult Delete(DateTime date)
+        [HttpDelete("{date; idRoom; tBusy;}")]
+        public IActionResult Delete(DateTime date, int idRoom, TimeSpan tBusy)
         {
-            DayOfBusy dayOfBusy = db.DaysOfBusy.FirstOrDefault(x => x.Date == date);
+            DayOfBusy dayOfBusy = db.DaysOfBusy.FirstOrDefault(x => x.Date == date
+                                                                    && x.IdRoom == idRoom
+                                                                    && x.TimeOfBusy == tBusy);
 
-            if (dayOfBusy == null) return BadRequest();
+            if (dayOfBusy == null) return NotFound("Day not found!");
 
             db.DaysOfBusy.Remove(dayOfBusy);
             db.SaveChanges();

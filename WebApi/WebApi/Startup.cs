@@ -20,6 +20,7 @@ namespace WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             string db = "Server=192.168.0.232;Database=students1;User Id=student;Password=student44";
+            //string db = "Server=81.211.69.78;Database=students1;User Id=student;Password=student44";
 
             services.AddDbContext<StudentsContext>(opt => opt.UseSqlServer(db));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
