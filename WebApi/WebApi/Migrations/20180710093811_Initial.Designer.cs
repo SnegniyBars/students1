@@ -10,7 +10,7 @@ using WebApi.Models;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(StudentsContext))]
-    [Migration("20180710085745_Initial")]
+    [Migration("20180710093811_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,11 +27,15 @@ namespace WebApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("CurrentDay");
+
+                    b.Property<bool>("CurrentWeek");
+
                     b.Property<string>("Holder");
 
-                    b.Property<int>("IdRoom");
-
                     b.Property<string>("Note");
+
+                    b.Property<int?>("RoomId");
 
                     b.Property<int?>("ScheDayId");
 
@@ -40,6 +44,8 @@ namespace WebApi.Migrations
                     b.Property<TimeSpan>("TimeOfFree");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
 
                     b.HasIndex("ScheDayId");
 
@@ -72,6 +78,10 @@ namespace WebApi.Migrations
 
             modelBuilder.Entity("WebApi.Models.DayOfBusy", b =>
                 {
+                    b.HasOne("WebApi.Models.MeetingRoom", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId");
+
                     b.HasOne("WebApi.Models.ScheDay")
                         .WithMany("Chunks")
                         .HasForeignKey("ScheDayId");

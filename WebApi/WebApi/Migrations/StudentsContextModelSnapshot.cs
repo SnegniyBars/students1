@@ -25,11 +25,15 @@ namespace WebApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<bool>("CurrentDay");
+
+                    b.Property<bool>("CurrentWeek");
+
                     b.Property<string>("Holder");
 
-                    b.Property<int>("IdRoom");
-
                     b.Property<string>("Note");
+
+                    b.Property<int?>("RoomId");
 
                     b.Property<int?>("ScheDayId");
 
@@ -38,6 +42,8 @@ namespace WebApi.Migrations
                     b.Property<TimeSpan>("TimeOfFree");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
 
                     b.HasIndex("ScheDayId");
 
@@ -70,6 +76,10 @@ namespace WebApi.Migrations
 
             modelBuilder.Entity("WebApi.Models.DayOfBusy", b =>
                 {
+                    b.HasOne("WebApi.Models.MeetingRoom", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId");
+
                     b.HasOne("WebApi.Models.ScheDay")
                         .WithMany("Chunks")
                         .HasForeignKey("ScheDayId");

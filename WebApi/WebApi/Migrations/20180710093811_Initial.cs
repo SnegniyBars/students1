@@ -39,16 +39,24 @@ namespace WebApi.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    IdRoom = table.Column<int>(nullable: false),
+                    RoomId = table.Column<int>(nullable: true),
                     TimeOfBusy = table.Column<TimeSpan>(nullable: false),
                     TimeOfFree = table.Column<TimeSpan>(nullable: false),
                     Holder = table.Column<string>(nullable: true),
                     Note = table.Column<string>(nullable: true),
+                    CurrentWeek = table.Column<bool>(nullable: false),
+                    CurrentDay = table.Column<bool>(nullable: false),
                     ScheDayId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DaysOfBusy", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DaysOfBusy_MeetingRooms_RoomId",
+                        column: x => x.RoomId,
+                        principalTable: "MeetingRooms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_DaysOfBusy_ScheDays_ScheDayId",
                         column: x => x.ScheDayId,
@@ -56,6 +64,11 @@ namespace WebApi.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_DaysOfBusy_RoomId",
+                table: "DaysOfBusy",
+                column: "RoomId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DaysOfBusy_ScheDayId",
