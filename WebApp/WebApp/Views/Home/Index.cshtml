@@ -16,10 +16,52 @@
     </header>
     <main class="content">
         <br />
+        <select>
+            <option id="all">Выберите переговорную</option>
+            <option id="room1">Переговорная №1</option>
+            <option id="room2">Переговорная №2</option>
+        </select>
+
         <p>Чтобы забронировать переговорную, выберите дату.</p>
         <p class="top-img"><img src="~/images/top.png"></p>
         <p class="left-img"><img src="~/images/left.png"></p>
         <p class="right-img"><img src="~/images/right.png"></p>
+
+        <div id="openModal" class="modalDialog modal-lg">
+            <div style="margin-top:5%">
+                <a href="#close" title="Закрыть" class="close">X</a>
+                <h2 text-align="center">Выберите переговорную и незанятое время.</h2>
+                <div class="modal-body">
+                    <table style="text-align: center" align="center">
+                        <thead>
+                            <tr>
+                                <td id="td1" style="padding-top:0.5%; padding-bottom:0.5%">Время</td>
+                                <td style="padding-top:0.5%; padding-bottom:0.5%"> П №1 </td>
+                                <td style="padding-top:0.5%; padding-bottom:0.5%"> П №2 </td>
+                            </tr>
+
+                            @for (int i = 0; i < 24; i++)
+                            {
+                                <tr>
+                                    @for (int j = 0; j < 3; j++)
+                                    {
+                                        if (j == 0)
+                                        {
+                                            <td style="padding-top:0.5%; padding-bottom:0.5%"><time>8:30</time>-<time>9:00</time></td>
+                                        }
+                                        else
+                                        {
+                                            <td id="td2" title="есть ли свободные переговорные"> @j </td>}
+                                    }
+
+                                </tr>
+                            }
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+
         <table style="text-align: center; width: 90%; height: 90%" cellpadding="2" cellspacing="2" align="center">
             <thead>
                 <tr>
@@ -49,13 +91,7 @@
                         }
                     </tr>
                 }
-                <div id="openModal" class="modalDialog">
-                    <div>
-                        <a href="#close" title="Закрыть" class="close">X</a>
-                        <h2 text-align="center">Модальное окно</h2>
-                        <p>Таблица</p>
-                    </div>
-                </div>
+
             </tbody>
         </table>
         <p class="bottom-img"><img src="~/images/bottom.png"></p>
