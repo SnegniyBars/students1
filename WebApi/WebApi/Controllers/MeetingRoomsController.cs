@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using WebApi.Models;
 
 namespace WebApi.Controllers
@@ -19,26 +15,26 @@ namespace WebApi.Controllers
 
             if (db.MeetingRooms.Count() == 0)
             {
-                db.MeetingRooms.Add(new MeetingRoom { });
-                db.MeetingRooms.Add(new MeetingRoom { });
+                db.MeetingRooms.Add(new MeetingRoom { Id = 1 });
+                db.MeetingRooms.Add(new MeetingRoom { Id = 2 });
                 db.SaveChanges();
             }
         }
 
-        [HttpGet]
-        public IEnumerable<MeetingRoom> Get()
+        [HttpGet("/getall")]
+        public IActionResult Get()
         {
-            return db.MeetingRooms.ToList();
+            return Ok(db.MeetingRooms.ToList());
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("/getone")]
         public IActionResult Get(int id)
         {
             MeetingRoom meetingRoom = db.MeetingRooms.FirstOrDefault(x => x.Id == id);
 
             if (meetingRoom == null) return NotFound();
 
-            return new ObjectResult(meetingRoom);
+            return Ok(meetingRoom);
         }
 
         [HttpPost]
@@ -52,7 +48,7 @@ namespace WebApi.Controllers
             return Ok(meetingRoom);
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
         public IActionResult Put([FromBody]MeetingRoom meetingRoom)
         {
             if (meetingRoom == null) return BadRequest();
@@ -65,7 +61,7 @@ namespace WebApi.Controllers
             return Ok(meetingRoom);
         }
         
-        [HttpDelete("{id}")]
+        [HttpDelete]
         public IActionResult Delete(int id)
         {
             MeetingRoom meetingRoom = db.MeetingRooms.FirstOrDefault(x => x.Id == id);

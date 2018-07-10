@@ -10,8 +10,8 @@ using WebApi.Models;
 namespace WebApi.Migrations
 {
     [DbContext(typeof(StudentsContext))]
-    [Migration("20180706073357_initial")]
-    partial class initial
+    [Migration("20180710085745_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -27,19 +27,21 @@ namespace WebApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<DateTime>("Date");
-
                     b.Property<string>("Holder");
 
                     b.Property<int>("IdRoom");
 
                     b.Property<string>("Note");
 
+                    b.Property<int?>("ScheDayId");
+
                     b.Property<TimeSpan>("TimeOfBusy");
 
                     b.Property<TimeSpan>("TimeOfFree");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ScheDayId");
 
                     b.ToTable("DaysOfBusy");
                 });
@@ -53,6 +55,26 @@ namespace WebApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("MeetingRooms");
+                });
+
+            modelBuilder.Entity("WebApi.Models.ScheDay", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("Date");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ScheDays");
+                });
+
+            modelBuilder.Entity("WebApi.Models.DayOfBusy", b =>
+                {
+                    b.HasOne("WebApi.Models.ScheDay")
+                        .WithMany("Chunks")
+                        .HasForeignKey("ScheDayId");
                 });
 #pragma warning restore 612, 618
         }
