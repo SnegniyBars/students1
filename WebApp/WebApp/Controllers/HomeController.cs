@@ -5,24 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Models;
-using WebApp.Utils;
 
 namespace WebApp.Controllers
 {
     public class HomeController : Controller
     {
-        private IRep _rep
-            ;
-
-        public HomeController(IRep rep)
-        {
-            _rep = rep;
-        }
-
         public IActionResult Index()
         {
-            var data = _rep.GetSch();
-
             return View();
         }
 
@@ -50,8 +39,5 @@ namespace WebApp.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
-
-
-
     }
 }

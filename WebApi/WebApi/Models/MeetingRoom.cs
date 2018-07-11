@@ -1,7 +1,10 @@
-﻿namespace WebApi.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace WebApi.Models
 {
     public class MeetingRoom
     {
-        public int Id { get; set; }
+        [Key]
+        public virtual int Id { get; set; }
     }
 }
