@@ -33,7 +33,6 @@ namespace WebApi
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-           // app.UseSwagger();
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseMvc();

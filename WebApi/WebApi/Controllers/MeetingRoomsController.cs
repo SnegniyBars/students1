@@ -12,23 +12,25 @@ namespace WebApi.Controllers
         public MeetingRoomsController(StudentsContext context)
         {
             db = context;
-
-            if (db.MeetingRooms.Count() == 0)
-            {
-                db.MeetingRooms.Add(new MeetingRoom { });
-                db.MeetingRooms.Add(new MeetingRoom { });
-                db.SaveChanges();
-            }
         }
 
+        /// <summary>
+        /// Получение списка всех переговорных
+        /// </summary>
+        /// <returns>Список переговорных</returns>
         [HttpGet("/getAllRooms")]
-        public IActionResult Get()
+        public IActionResult GetAll()
         {
             return Ok(db.MeetingRooms.ToList());
         }
 
+        /// <summary>
+        /// Получение переговорной по номеру в БД
+        /// </summary>
+        /// <param name="id">Номер переговорной в БД</param>
+        /// <returns>Переговорная</returns>
         [HttpGet("/getOneRoom")]
-        public IActionResult Get(int id)
+        public IActionResult GetOne(int id)
         {
             MeetingRoom meetingRoom = db.MeetingRooms.FirstOrDefault(x => x.Id == id);
 
@@ -37,10 +39,14 @@ namespace WebApi.Controllers
             return Ok(meetingRoom);
         }
 
+        /// <summary>
+        /// Добавление переговорной в БД
+        /// </summary>
+        /// <returns>Сообщение о выполнении</returns>
         [HttpPost]
-        public IActionResult Post([FromBody]MeetingRoom meetingRoom)
+        public IActionResult AddRoom()
         {
-            if (meetingRoom == null) return BadRequest();
+            MeetingRoom meetingRoom = new MeetingRoom { };
 
             db.MeetingRooms.Add(meetingRoom);
             db.SaveChanges();
@@ -48,25 +54,37 @@ namespace WebApi.Controllers
             return Ok(meetingRoom);
         }
 
+        /// <summary>
+        /// Обновление записи БД о переговорной
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>Сообщение о выполнении</returns>
         [HttpPut]
-        public IActionResult Put([FromBody]MeetingRoom meetingRoom)
+        public IActionResult Put(int id)
         {
-            if (meetingRoom == null) return BadRequest();
+            MeetingRoom meetingRoom = db.MeetingRooms
+                .FirstOrDefault(x => x.Id == id);
 
-            if (db.MeetingRooms.Any(x => x.Id == meetingRoom.Id)) return NotFound();
+            if (meetingRoom == null) return NotFound("Meeting room not found!");
 
             db.Update(meetingRoom);
             db.SaveChanges();
 
             return Ok(meetingRoom);
         }
-        
+
+        /// <summary>
+        /// Удаление записи БД о переговорной
+        /// </summary>
+        /// <param name="id">Номер переговорной</param>
+        /// <returns>Сообщение о выполнении</returns>
         [HttpDelete]
         public IActionResult Delete(int id)
         {
-            MeetingRoom meetingRoom = db.MeetingRooms.FirstOrDefault(x => x.Id == id);
+            MeetingRoom meetingRoom = db.MeetingRooms
+                .FirstOrDefault(x => x.Id == id);
 
-            if (meetingRoom == null) return NotFound();
+            if (meetingRoom == null) return NotFound("Meeting room not found!");
 
             db.MeetingRooms.Remove(meetingRoom);
             db.SaveChanges();
