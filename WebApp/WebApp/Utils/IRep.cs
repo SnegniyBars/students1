@@ -7,6 +7,6 @@ namespace WebApp.Utils
 {
     public interface IRep
     {
-        List<object> GetSch(DateTime? from = null, DateTime? to = null, int? kab = null)
+        List<object> GetSch(DateTime? from = null, DateTime? to = null);
     }
 }

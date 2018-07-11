@@ -32,13 +32,16 @@ namespace WebApp
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
             
-            //services.AddTransient<IRep,Rep>();
+            services.AddTransient<IRep,Rep>();
+          
+           
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, IRep rep)
         {
             if (env.IsDevelopment())
             {
@@ -53,12 +56,18 @@ namespace WebApp
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-
+            app.UseMiddleware<SchedulerMiddleware>();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
+            });
+           // var something = rep.GetScheduler();
+            app.Run(async (context) =>
+            {
+                await context.Response.WriteAsync("Hello");
+              //  await context.Response.WriteAsync(rep.GetScheduler().ToString());
             });
         }
     }
