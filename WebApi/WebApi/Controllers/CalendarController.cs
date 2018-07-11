@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using WebApi.Models;
 
 namespace WebApi.Controllers
@@ -92,6 +93,10 @@ namespace WebApi.Controllers
         [HttpPost]
         public IActionResult Post([FromBody]DayOfBusy dayOfBusy)
         {
+            var qwe = db.ScheDays
+                .Include(_=>_.Chunks)
+                .First();
+
             //if (db.DaysOfBusy.Any(x => x.Date == dayOfBusy.Date
             //                           && x.IdRoom == dayOfBusy.IdRoom
             //                           && ((x.TimeOfBusy <= dayOfBusy.TimeOfBusy || x.TimeOfBusy > dayOfBusy.TimeOfBusy)
