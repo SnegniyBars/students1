@@ -1,0 +1,12 @@
+﻿DayOfBusy
+{
+  "room": {
+    "id": 1
+  },
+  "timeOfBusy": "4:00",
+  "timeOfFree": "5:00",
+  "holder": "string",
+  "note": "string", (optional)
+  "currentWeek": true,
+  "currentDay": true
+}

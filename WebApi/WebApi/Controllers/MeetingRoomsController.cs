@@ -4,7 +4,7 @@ using WebApi.Models;
 
 namespace WebApi.Controllers
 {
-    [Route("api/mrs")]
+    [Route("api/[controller]")]
     public class MeetingRoomsController : Controller
     {
         StudentsContext db;
@@ -15,19 +15,19 @@ namespace WebApi.Controllers
 
             if (db.MeetingRooms.Count() == 0)
             {
-                db.MeetingRooms.Add(new MeetingRoom { Id = 1 });
-                db.MeetingRooms.Add(new MeetingRoom { Id = 2 });
+                db.MeetingRooms.Add(new MeetingRoom { });
+                db.MeetingRooms.Add(new MeetingRoom { });
                 db.SaveChanges();
             }
         }
 
-        [HttpGet("/getall")]
+        [HttpGet("/getAllRooms")]
         public IActionResult Get()
         {
             return Ok(db.MeetingRooms.ToList());
         }
 
-        [HttpGet("/getone")]
+        [HttpGet("/getOneRoom")]
         public IActionResult Get(int id)
         {
             MeetingRoom meetingRoom = db.MeetingRooms.FirstOrDefault(x => x.Id == id);
