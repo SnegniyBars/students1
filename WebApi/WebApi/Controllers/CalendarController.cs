@@ -45,14 +45,12 @@ namespace WebApi.Controllers
 
             while (startDay < endDay)
             {
-                ScheDay scheDay = db.ScheDays
-                    .Include(x => x.Chunks)
-                    .FirstOrDefault(x => x.Date == startDay);
+                ScheDay scheDay = GetScheDay(startDay.Value);
 
-                if (scheDay != null) //если дата есть в БД, берёт запись БД
+                if (scheDay != null && scheDay.Chunks.Count > 0) //если дата есть в БД, берёт запись БД
                     foreach(DayOfBusy day in scheDay.Chunks)
                         weeks.Add(CutInfo(day, startDay.Value));
-                else
+                else //иначе создаёт пустой объект
                     weeks.Add(CutInfo(new DayOfBusy(), startDay.Value));
 
                 startDay = startDay.Value.AddDays(1);
@@ -68,13 +66,13 @@ namespace WebApi.Controllers
         /// <param name="roomId">Номер переговорной</param>
         /// <returns>Расписание/returns>
         [HttpGet("/getday")]
-        public IActionResult GetDay(DateTime date, int? roomId)
+        public IActionResult GetDay(DateTime date, int? roomId = null)
         {
             ScheDay scheDay = GetScheDay(date);
 
             if (scheDay == null) return NotFound("Date is free!");
 
-            if (roomId != null && !IsRoomExists(roomId.Value))
+            if (roomId != null && IsRoomNotExists(roomId.Value))
                 return BadRequest("Room not found!");
 
             List<DayOfBusy> days = roomId == null
@@ -100,15 +98,10 @@ namespace WebApi.Controllers
         [HttpPost]
         public IActionResult AddDay([FromBody]DayOfBusy dayOfBusy, DateTime? date = null)
         {
-            if (dayOfBusy == null) return BadRequest("Day can not be null!");
+            bool invalid;
+            IActionResult request = IsDayInvalid(dayOfBusy, out invalid);
 
-            if (dayOfBusy.Holder == null) return BadRequest("Holder can not be null!");
-
-            if (!IsRoomExists(dayOfBusy.RoomId)) return NotFound("Room not found!");
-
-            if ((dayOfBusy.TimeOfBusy < new TimeSpan(8, 0, 0) && dayOfBusy.TimeOfBusy >= new TimeSpan(20, 0, 0))
-                || (dayOfBusy.TimeOfFree <= new TimeSpan(8, 0, 0) && dayOfBusy.TimeOfFree > new TimeSpan(20, 0, 0)))
-                return BadRequest("Room can be occupied only during working hours!");
+            if (invalid) return request;
 
             if (date == null) date = DateTime.Today;
 
@@ -124,12 +117,7 @@ namespace WebApi.Controllers
                 scheDay = GetScheDay(date.Value);
             } //если указанной даты нет, добавляем её в БД
 
-            if (scheDay.Chunks
-                .Any(x => x.RoomId == dayOfBusy.RoomId
-                          && x.TimeOfBusy <= dayOfBusy.TimeOfBusy
-                             || x.TimeOfBusy > dayOfBusy.TimeOfBusy
-                          && x.TimeOfFree <= dayOfBusy.TimeOfFree
-                             || x.TimeOfFree > dayOfBusy.TimeOfFree))
+            if (IsTimeIntervalInvalid(scheDay.Chunks, dayOfBusy))
                 return BadRequest("Room already exists!");
 
             dayOfBusy.ScheDayId = scheDay.Id;
@@ -139,12 +127,19 @@ namespace WebApi.Controllers
             return Ok(dayOfBusy);
         }
 
+        /// <summary>
+        /// Обновление записи БД
+        /// </summary>
+        /// <param name="date">Дата</param>
+        /// <param name="oldDay">Старые данные</param>
+        /// <param name="newDay">Новые данные</param>
+        /// <returns>Сообщение о выполнении</returns>
         [HttpPut]
         public IActionResult Update(DateTime date, [FromBody]DayOfBusy oldDay, [FromBody]DayOfBusy newDay)
         {
             if (oldDay == null || newDay == null) return BadRequest("Day can not be null!");
 
-            if (!IsRoomExists(newDay.RoomId)) return NotFound("Room not found!");
+            if (IsRoomNotExists(newDay.RoomId)) return NotFound("Room not found!");
 
             ScheDay scheDay = GetScheDay(date);
 
@@ -182,7 +177,7 @@ namespace WebApi.Controllers
             if (scheDay == null)
                 return NotFound("Day is not busy!");
 
-            if (!IsRoomExists(idRoom)) return NotFound("Room not found!");
+            if (IsRoomNotExists(idRoom)) return NotFound("Room not found!");
 
             DayOfBusy day = scheDay.Chunks
                 .FirstOrDefault(x => x.RoomId == idRoom
@@ -193,6 +188,14 @@ namespace WebApi.Controllers
 
             db.DaysOfBusy.Remove(day);
             db.SaveChanges();
+
+            scheDay = GetScheDay(date);
+
+            if (scheDay.Chunks.Count == 0)
+            {
+                db.ScheDays.Remove(scheDay);
+                db.SaveChanges();
+            }
 
             return Ok(date);
         }
@@ -258,10 +261,38 @@ namespace WebApi.Controllers
         /// </summary>
         /// <param name="id">Номер переговорной</param>
         /// <returns>Ответ</returns>
-        bool IsRoomExists(int id)
+        bool IsRoomNotExists(int id)
         {
             return db.MeetingRooms
-                .FirstOrDefault(x => x.Id == id) != null;
+                .FirstOrDefault(x => x.Id == id) == null;
+        }
+
+        IActionResult IsDayInvalid(DayOfBusy dayOfBusy, out bool flag)
+        {
+            if (flag = dayOfBusy == null) return BadRequest("Day can not be null!");
+
+            if (flag = dayOfBusy.Holder == null) return BadRequest("Holder can not be null!");
+
+            if (flag = IsRoomNotExists(dayOfBusy.RoomId)) return NotFound("Room not found!");
+
+            if (flag = dayOfBusy.TimeOfBusy == dayOfBusy.TimeOfFree) return BadRequest("Invalid time interval!");
+
+            if (flag = dayOfBusy.TimeOfBusy < new TimeSpan(8, 0, 0) || dayOfBusy.TimeOfBusy >= new TimeSpan(20, 0, 0)
+                       || dayOfBusy.TimeOfFree <= new TimeSpan(8, 0, 0) || dayOfBusy.TimeOfFree > new TimeSpan(20, 0, 0))
+                return BadRequest("Room can be occupied only during working hours!");
+
+            return Ok(dayOfBusy);
+        }
+
+        bool IsTimeIntervalInvalid(List<DayOfBusy> chunks, DayOfBusy day)
+        {
+            return chunks.Any(x => x.RoomId == day.RoomId
+                                    && day.TimeOfBusy >= x.TimeOfBusy
+                                        && (day.TimeOfBusy <= x.TimeOfFree
+                                        && day.TimeOfFree >= x.TimeOfFree || day.TimeOfFree <= day.TimeOfFree)
+                                    || day.TimeOfBusy <= x.TimeOfBusy
+                                        && (day.TimeOfFree >= x.TimeOfBusy
+                                        && day.TimeOfFree <= x.TimeOfFree || day.TimeOfFree >= x.TimeOfFree));
         }
     }
 }
