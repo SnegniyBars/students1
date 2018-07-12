@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using WebApp.Utils;
 
 namespace WebApp
 {
@@ -17,10 +18,10 @@ namespace WebApp
             _next = next;
         }
 
-        public Task Invoke(HttpContext httpContext)
+        public async Task Invoke(HttpContext httpContext, IRep rep)
         {
-
-            return _next(httpContext);
+            httpContext.Response.ContentType = "text/html;charset=utf-8";
+            await httpContext.Response.WriteAsync($"Рез-т{rep.GetSch()}");
         }
     }
 

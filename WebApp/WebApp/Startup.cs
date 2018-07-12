@@ -63,11 +63,11 @@ namespace WebApp
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-           // var something = rep.GetScheduler();
+           var something = rep.GetSch();
             app.Run(async (context) =>
             {
-                await context.Response.WriteAsync("Hello");
-              //  await context.Response.WriteAsync(rep.GetScheduler().ToString());
+              //  await context.Response.WriteAsync("Hello");
+                await context.Response.WriteAsync(something.ToString());
             });
         }
     }
