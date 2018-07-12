@@ -8,10 +8,11 @@ namespace WebApp.Utils
     public class DataParser
     {
         private IRep _rep;
-        public List<ShortInfoDay> List => _rep.GetSch();
+        public List<ShortInfoDay> List;
         public DataParser(IRep rep)
         {
             _rep = rep;
+            List = _rep.GetSch();
         }
         public void Parse() //Count || 
         {

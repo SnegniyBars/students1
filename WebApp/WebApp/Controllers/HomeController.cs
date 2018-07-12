@@ -6,14 +6,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using WebApp.Models;
 using WebApp.Utils;
+
 namespace WebApp.Controllers
 {
     public class HomeController : Controller
     {
+        //[HttpGet("/getting")]
         public IActionResult Index()
         {
             DataParser someObj = new DataParser(new Rep());
-            return View();
+            return View(someObj);
         }
 
         public IActionResult About()

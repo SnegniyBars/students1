@@ -18,8 +18,8 @@ namespace WebApp.Utils
 
         public List<ShortInfoDay> GetSch(DateTime? from = null, DateTime? to = null)
         {
-            try
-            {
+            //try
+            //{
                 using (var httpClient = new HttpClient())
                 {
                     //var str = httpClient.GetStringAsync($"{_baseUrl}getSch").Result;
@@ -27,13 +27,13 @@ namespace WebApp.Utils
                     var res = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ShortInfoDay>>(str);
 
                     return res;
-                }
-            }
-            catch (Exception)
-            {
+               }
+            //}
+            //catch (Exception)
+            //{
 
-                return new List<ShortInfoDay>();
-            }
+            //    return new List<ShortInfoDay>();
+            //}
            
         }
 
