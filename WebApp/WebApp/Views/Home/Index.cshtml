@@ -1,13 +1,15 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
+@using WebApp.Utils;
+@model WebApp.Utils.DataParser;
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title></title>
     <link href="~/css/site.css?v=@DateTime.Now.Millisecond" rel="stylesheet" />
+
 </head>
 
 <body>
@@ -40,6 +42,14 @@
                                 <td style="padding-top:0.5%; padding-bottom:0.5%"> П №2 </td>
                             </tr>
 
+                            @*@{
+                                foreach (var item in Model.List)
+                                {
+
+                                }
+                            }*@
+
+
                             @for (int i = 0; i < 24; i++)
                             {
                                 <tr>
@@ -51,7 +61,8 @@
                                         }
                                         else
                                         {
-                                            <td id="td2" title="есть ли свободные переговорные"> @j </td>}
+                                            <td id="td2" title="есть ли свободные переговорные"> @j </td>
+                                        }
                                     }
 
                                 </tr>
@@ -95,8 +106,9 @@
             </tbody>
         </table>
         <p class="bottom-img"><img src="~/images/bottom.png"></p>
+
     </main>
-    
+
     <footer class="footer">
         2018 - Практика в ММТР
     </footer>

@@ -56,19 +56,19 @@ namespace WebApp
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
-            app.UseMiddleware<SchedulerMiddleware>();
+            //app.UseMiddleware<SchedulerMiddleware>();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-           var something = rep.GetSch();
-            app.Run(async (context) =>
-            {
-              //  await context.Response.WriteAsync("Hello");
-                await context.Response.WriteAsync(something.ToString());
-            });
+           //var something = rep.GetSch();
+           // app.Run(async (context) =>
+           // {
+           //   //  await context.Response.WriteAsync("Hello");
+           //     await context.Response.WriteAsync(something.ToString());
+           // });
         }
     }
 }
