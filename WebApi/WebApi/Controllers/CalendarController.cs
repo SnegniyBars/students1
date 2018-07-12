@@ -74,12 +74,19 @@ namespace WebApi.Controllers
 
             if (scheDay == null) return NotFound("Date is free!");
 
-            if (roomId != null && db.MeetingRooms.Find(roomId.Value) == null)
-                return BadRequest("Meeting room not found!");
+            if (roomId != null && !IsRoomExists(roomId.Value))
+                return BadRequest("Room not found!");
 
             List<DayOfBusy> days = roomId == null
                 ? scheDay.Chunks
                 : scheDay.Chunks.FindAll(x => x.RoomId == roomId); //находим все записи по номеру переговорной
+
+            if (date == DateTime.Today)
+                foreach (DayOfBusy day in days)
+                {
+                    day.CurrentDay = true;
+                    day.CurrentWeek = IsCurrentWeek(date);
+                }
 
             return Ok(days);
         }
@@ -95,11 +102,12 @@ namespace WebApi.Controllers
         {
             if (dayOfBusy == null) return BadRequest("Day can not be null!");
 
-            TimeSpan strtDay = new TimeSpan(8, 0, 0),
-                     endDay = new TimeSpan(20, 0, 0);
+            if (dayOfBusy.Holder == null) return BadRequest("Holder can not be null!");
 
-            if ((dayOfBusy.TimeOfBusy < strtDay && dayOfBusy.TimeOfBusy >= endDay)
-                || (dayOfBusy.TimeOfFree <= strtDay && dayOfBusy.TimeOfFree > endDay))
+            if (!IsRoomExists(dayOfBusy.RoomId)) return NotFound("Room not found!");
+
+            if ((dayOfBusy.TimeOfBusy < new TimeSpan(8, 0, 0) && dayOfBusy.TimeOfBusy >= new TimeSpan(20, 0, 0))
+                || (dayOfBusy.TimeOfFree <= new TimeSpan(8, 0, 0) && dayOfBusy.TimeOfFree > new TimeSpan(20, 0, 0)))
                 return BadRequest("Room can be occupied only during working hours!");
 
             if (date == null) date = DateTime.Today;
@@ -116,12 +124,6 @@ namespace WebApi.Controllers
                 scheDay = GetScheDay(date.Value);
             } //если указанной даты нет, добавляем её в БД
 
-            dayOfBusy.RoomId = dayOfBusy.Room.Id;
-
-            if (db.MeetingRooms
-                .FirstOrDefault(x => x.Id == dayOfBusy.RoomId) == null)
-                return BadRequest("Invalid room!");
-
             if (scheDay.Chunks
                 .Any(x => x.RoomId == dayOfBusy.RoomId
                           && x.TimeOfBusy <= dayOfBusy.TimeOfBusy
@@ -130,7 +132,6 @@ namespace WebApi.Controllers
                              || x.TimeOfFree > dayOfBusy.TimeOfFree))
                 return BadRequest("Room already exists!");
 
-            dayOfBusy.ScheDay = scheDay;
             dayOfBusy.ScheDayId = scheDay.Id;
             db.DaysOfBusy.Add(dayOfBusy);
             db.SaveChanges();
@@ -139,21 +140,31 @@ namespace WebApi.Controllers
         }
 
         [HttpPut]
-        public IActionResult Update(DateTime date, [FromBody]DayOfBusy oDay, [FromBody]DayOfBusy nDay)
+        public IActionResult Update(DateTime date, [FromBody]DayOfBusy oldDay, [FromBody]DayOfBusy newDay)
         {
-            return Ok();
-            //if (dayOfBusy == null)
-            //    return BadRequest("Day can not be null!");
+            if (oldDay == null || newDay == null) return BadRequest("Day can not be null!");
 
-            //ScheDay scheDay = GetScheDay(date);
+            if (!IsRoomExists(newDay.RoomId)) return NotFound("Room not found!");
 
-            //if (scheDay == null)
-            //    return NotFound("Day is not busy!");
+            ScheDay scheDay = GetScheDay(date);
 
-            //if (scheDay.Chunks
-            //    .FirstOrDefault(x => ))
+            if (scheDay == null) return NotFound("There are no occupied rooms for this date!");
 
-            //return Ok(dayOfBusy);
+            oldDay = scheDay.Chunks
+                .FirstOrDefault(x => x.RoomId == oldDay.RoomId
+                                     && x.TimeOfBusy == oldDay.TimeOfBusy
+                                     && x.TimeOfFree == oldDay.TimeOfFree
+                                     && x.Holder == oldDay.Holder);
+
+            if (oldDay == null) return BadRequest("There is no such schedule!");
+
+            newDay.ScheDayId = oldDay.ScheDayId;
+            oldDay = newDay;
+
+            db.DaysOfBusy.Update(oldDay);
+            db.SaveChanges();
+
+            return Ok(newDay);
         }
 
         /// <summary>
@@ -170,6 +181,8 @@ namespace WebApi.Controllers
 
             if (scheDay == null)
                 return NotFound("Day is not busy!");
+
+            if (!IsRoomExists(idRoom)) return NotFound("Room not found!");
 
             DayOfBusy day = scheDay.Chunks
                 .FirstOrDefault(x => x.RoomId == idRoom
@@ -204,16 +217,14 @@ namespace WebApi.Controllers
         /// <returns>Обрезанная информация</returns>
         ShortInfoDay CutInfo(DayOfBusy day, DateTime date)
         {
-            DateTime startWeek = StartOfWeek(DateTime.Today, DayOfWeek.Monday),
-                     endWeek = startWeek.AddDays(7);
-
             return new ShortInfoDay
             {
                 IdRoom = day.RoomId,
                 TimeOfBusy = day.TimeOfBusy,
                 TimeOfFree = day.TimeOfFree,
+                Date = date,
                 CurrentDay = date == DateTime.Today,
-                CurrentWeek = date >= startWeek && date < endWeek
+                CurrentWeek = IsCurrentWeek(date)
             };
         }
 
@@ -227,6 +238,30 @@ namespace WebApi.Controllers
             return db.ScheDays
                 .Include(x => x.Chunks)
                 .FirstOrDefault(x => x.Date == date);
+        }
+
+        /// <summary>
+        /// Возвращает ответ, находится ли дата в текущей недели
+        /// </summary>
+        /// <param name="date">Дата</param>
+        /// <returns>Ответ</returns>
+        bool IsCurrentWeek(DateTime date)
+        {
+            DateTime startWeek = StartOfWeek(DateTime.Today, DayOfWeek.Monday),
+                     endWeek = startWeek.AddDays(7);
+
+            return date >= startWeek && date < endWeek;
+        }
+
+        /// <summary>
+        /// Проверяет существует ли запись о переговорной в БД
+        /// </summary>
+        /// <param name="id">Номер переговорной</param>
+        /// <returns>Ответ</returns>
+        bool IsRoomExists(int id)
+        {
+            return db.MeetingRooms
+                .FirstOrDefault(x => x.Id == id) != null;
         }
     }
 }

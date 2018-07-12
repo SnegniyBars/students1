@@ -7,7 +7,7 @@ namespace WebApi.Controllers
     [Route("api/[controller]")]
     public class MeetingRoomsController : Controller
     {
-        StudentsContext db;
+        readonly StudentsContext db;
 
         public MeetingRoomsController(StudentsContext context)
         {
@@ -32,9 +32,10 @@ namespace WebApi.Controllers
         [HttpGet("/getOneRoom")]
         public IActionResult GetOne(int id)
         {
-            MeetingRoom meetingRoom = db.MeetingRooms.FirstOrDefault(x => x.Id == id);
+            MeetingRoom meetingRoom = db.MeetingRooms
+                .FirstOrDefault(x => x.Id == id);
 
-            if (meetingRoom == null) return NotFound();
+            if (meetingRoom == null) return NotFound("Room not found!");
 
             return Ok(meetingRoom);
         }
