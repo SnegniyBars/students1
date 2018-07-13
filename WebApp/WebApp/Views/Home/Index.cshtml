@@ -3,13 +3,15 @@
 }
 @using WebApp.Utils;
 @model WebApp.Utils.DataParser;
+@using WebApp.Enums;
+
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title></title>
     <link href="~/css/site.css?v=@DateTime.Now.Millisecond" rel="stylesheet" />
-
+    <script src="~/js/site.js"></script>
 </head>
 
 <body>
@@ -25,6 +27,7 @@
         </select>
 
         <p>Чтобы забронировать переговорную, выберите дату.</p>
+        @*<button id="top" onclick='TopButton("@Url.Action("","")", "@DataChange.DecWeeks")'> <p class="top-img"><img src="~/images/top.png"></p></button>*@
         <p class="top-img"><img src="~/images/top.png"></p>
         <p class="left-img"><img src="~/images/left.png"></p>
         <p class="right-img"><img src="~/images/right.png"></p>
@@ -41,11 +44,6 @@
                                 <td style="padding-top:0.5%; padding-bottom:0.5%"> П №1 </td>
                                 <td style="padding-top:0.5%; padding-bottom:0.5%"> П №2 </td>
                             </tr>
-
-
-
-
-
                             @for (int i = 0; i < 24; i++)
                             {
                                 <tr>
@@ -68,7 +66,6 @@
                 </div>
             </div>
         </div>
-
         <h2></h2>
         <table style="text-align: center; width: 90%; height: 90%" cellpadding="2" cellspacing="2" align="center">
             <thead>
@@ -83,28 +80,39 @@
                 </tr>
             </thead>
             <tbody>
-
-
                 @foreach (var v in Model.List)
                 {
 
                     @if (v.Date.DayOfWeek == DayOfWeek.Saturday || v.Date.DayOfWeek == DayOfWeek.Sunday)
                     {
-                        @if (v.CurrentDay == true)
+                        @if (v.CurrentWeek == true)
                         {
-                        <td id="td2" style="background: linear-gradient(#fa9e9e, #ffffff); border-color: #000000" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
+                            @if (v.CurrentDay == true)
+                            {
+                            <td id="td2" style="background: linear-gradient(#fa9e9e, #ffffff); border-color: #000000" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
+                        }
+                        else
+                        {
+                            <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #687df8" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
+                        }
+                        }
+                        else
+                        {
+                            <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
+                        }
                     }
                     else
                     {
-                        <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
-                    }
-                    }
-
-                    else
-                    {
-                        @if (v.CurrentDay == true)
+                        @if (v.CurrentWeek == true)
                         {
-                            <td id="td2" style="background: linear-gradient(#95d390, #ffffff); border-color: #000000" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
+                            @if (v.CurrentDay == true)
+                            {
+                                <td id="td2" style="background: linear-gradient(#95d390, #ffffff); border-color: #000000" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
+                            }
+                            else
+                            {
+                                <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff); border-color: #687df8" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
+                            }
                         }
                         else
                         {
@@ -116,27 +124,27 @@
                         <tr></tr>
                     }
 
-
                 }
 
 
 
+
                 @*@for (int i = 0; i < 5; i++)
-                {
-                <tr>
-                    @for (int j = 1; j < 8; j++)
                     {
-                        @if (j < 6)
+                    <tr>
+                        @for (int j = 1; j < 8; j++)
                         {
-                            <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff)" title="  "> <a href="#openModal">@j</a> </td>
+                            @if (j < 6)
+                            {
+                                <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff)" title="  "> <a href="#openModal">@j</a> </td>
+                            }
+                            else
+                            {
+                                <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@j</a></td>
+                            }
                         }
-                        else
-                        {
-                            <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@j</a></td>
-                        }
-                    }
-                </tr>
-            }*@
+                    </tr>
+                }*@
 
                 </tbody>
             </table>
@@ -145,10 +153,11 @@
 
         </main>
 
-    <footer class="footer">
-        2018 - Практика в ММТР
-    </footer>
+        <footer class="footer">
+            2018 - Практика в ММТР
+        </footer>
 
-</body>
+       
+    </body>
 </html>
 

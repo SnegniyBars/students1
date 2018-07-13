@@ -22,7 +22,7 @@ namespace WebApp.Utils
             //{
                 using (var httpClient = new HttpClient())
                 {
-                    //var str = httpClient.GetStringAsync($"{_baseUrl}getSch").Result;
+                 
                     var str = httpClient.GetStringAsync($"{_baseUrl}GetScheduler").Result;
                     var res = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ShortInfoDay>>(str);
 
@@ -36,6 +36,27 @@ namespace WebApp.Utils
             //}
            
         }
+        public List<ShortInfoDay> GetSch1(DateTime? from = null, DateTime? to = null)
+        {
+            //try
+            //{
+            using (var httpClient = new HttpClient())
+            {
+                //var str = httpClient.GetStringAsync($"{_baseUrl}getSch").Result;
+                var str = httpClient.GetStringAsync($"{_baseUrl}GetScheduler?startDay=" + from + "&endDay=" + to).Result;
+                var res = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ShortInfoDay>>(str);
+
+                return res;
+            }
+            //}
+            //catch (Exception)
+            //{
+
+            //    return new List<ShortInfoDay>();
+            //}
+
+        }
+
 
     }
 }
