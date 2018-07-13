@@ -68,7 +68,7 @@
                 </div>
             </div>
         </div>
-
+        
         <table style="text-align: center; width: 90%; height: 90%" cellpadding="2" cellspacing="2" align="center">
             <thead>
                 <tr>
@@ -82,32 +82,67 @@
                 </tr>
             </thead>
             <tbody>
-                @for (int i = 0; i < 5; i++)
+
+
+                @foreach (var v in Model.List)
                 {
-                    <tr>
-                        @for (int j = 1; j < 8; j++)
+
+                    @if (v.Date.DayOfWeek == DayOfWeek.Saturday || v.Date.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        @if (v.CurrentDay == true)
                         {
-                            @if (j < 6)
-                            {
-                                <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff)" title="  "> <a href="#openModal">@j</a> </td>
-                            }
-                            else
-                            {
-                                <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@j</a></td>
-                            }
+                        <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #6d75fb" title="  "><a href="#openModal">@v.Date.Day.@v.Date.Month</a></td>
+                    }
+                    else
+                    {
+                        <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@v.Date.Day.@v.Date.Month</a></td>
+                    }
+                    }
+
+                    else
+                    {
+                        @if (v.CurrentDay == true)
+                        {
+                            <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff); border-color: #6d75fb" title="  "><a href="#openModal">@v.Date.Day.@v.Date.Month</a></td>
                         }
-                    </tr>
+                        else
+                        {
+                            <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff); border-color: #43a938" title="  "><a href="#openModal">@v.Date.Day.@v.Date.Month</a></td>
+                        }
+                    }
+                    @if (v.Date.DayOfWeek == DayOfWeek.Sunday)
+                    {
+                        <tr></tr>
+                    }
+
+
                 }
 
-            </tbody>
-        </table>
 
-        <p class="bottom-img"><img src="~/images/bottom.png"></p>
-       
-       
-            
-        
-    </main>
+
+                @*@for (int i = 0; i < 5; i++)
+                {
+                <tr>
+                    @for (int j = 1; j < 8; j++)
+                    {
+                        @if (j < 6)
+                        {
+                            <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff)" title="  "> <a href="#openModal">@j</a> </td>
+                        }
+                        else
+                        {
+                            <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@j</a></td>
+                        }
+                    }
+                </tr>
+            }*@
+
+                </tbody>
+            </table>
+
+            <p class="bottom-img"><img src="~/images/bottom.png"></p>
+
+        </main>
 
     <footer class="footer">
         2018 - Практика в ММТР
