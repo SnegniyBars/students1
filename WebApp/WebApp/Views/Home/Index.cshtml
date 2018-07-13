@@ -68,7 +68,8 @@
                 </div>
             </div>
         </div>
-        
+
+        <h2></h2>
         <table style="text-align: center; width: 90%; height: 90%" cellpadding="2" cellspacing="2" align="center">
             <thead>
                 <tr>
@@ -91,11 +92,11 @@
                     {
                         @if (v.CurrentDay == true)
                         {
-                        <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #6d75fb" title="  "><a href="#openModal">@v.Date.Day.@v.Date.Month</a></td>
+                        <td id="td2" style="background: linear-gradient(#fa9e9e, #ffffff); border-color: #000000" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
                     }
                     else
                     {
-                        <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@v.Date.Day.@v.Date.Month</a></td>
+                        <td id="td2" style="background: linear-gradient(#FFE4E1, #ffffff); border-color: #fa9e9e" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
                     }
                     }
 
@@ -103,11 +104,11 @@
                     {
                         @if (v.CurrentDay == true)
                         {
-                            <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff); border-color: #6d75fb" title="  "><a href="#openModal">@v.Date.Day.@v.Date.Month</a></td>
+                            <td id="td2" style="background: linear-gradient(#95d390, #ffffff); border-color: #000000" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
                         }
                         else
                         {
-                            <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff); border-color: #43a938" title="  "><a href="#openModal">@v.Date.Day.@v.Date.Month</a></td>
+                            <td id="td2" style="background: linear-gradient(#F0FFF0, #ffffff); border-color: #43a938" title="  "><a href="#openModal">@v.Date.Day @v.Month</a></td>
                         }
                     }
                     @if (v.Date.DayOfWeek == DayOfWeek.Sunday)
