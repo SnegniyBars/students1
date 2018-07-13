@@ -46,7 +46,7 @@ namespace WebApi.Controllers
             while (startDay < endDay)
             {
                 ScheDay scheDay = GetScheDay(startDay.Value);
-                ShortInfoDay day = new ShortInfoDay(startDay.Value);
+                ShortInfoDay day = new ShortInfoDay { Date = startDay.Value };
                 day.CurrentWeek = IsCurrentWeek(startDay.Value);
 
                 if (scheDay != null && scheDay.Chunks.Count > 0)
