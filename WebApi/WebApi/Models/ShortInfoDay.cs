@@ -15,7 +15,7 @@ namespace WebApi.Models
         public DateTime Date { get; set; }
         public string Month
         {
-            get { return Date.ToString("MMM", CultureInfo.InvariantCulture); }
+            get { return Date.ToString("MMMMMMMM", CultureInfo.GetCultureInfo("ru-RU-Cyrl")); }
         }
         public bool CurrentWeek { get; set; }
         public bool CurrentDay { get; set; }
