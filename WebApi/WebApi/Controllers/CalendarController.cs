@@ -46,12 +46,16 @@ namespace WebApi.Controllers
             while (startDay < endDay)
             {
                 ScheDay scheDay = GetScheDay(startDay.Value);
+                ShortInfoDay day = new ShortInfoDay(startDay.Value);
+                day.CurrentWeek = IsCurrentWeek(startDay.Value);
 
-                if (scheDay != null && scheDay.Chunks.Count > 0) //если дата есть в БД, берёт запись БД
-                    foreach(DayOfBusy day in scheDay.Chunks)
-                        weeks.Add(CutInfo(day, startDay.Value));
-                else //иначе создаёт пустой объект
-                    weeks.Add(CutInfo(new DayOfBusy(), startDay.Value));
+                if (scheDay != null && scheDay.Chunks.Count > 0)
+                {
+                    day.CountRes = scheDay.Chunks.Count;
+                    weeks.Add(day);
+                }
+                else
+                    weeks.Add(day);
 
                 startDay = startDay.Value.AddDays(1);
             }
@@ -210,25 +214,6 @@ namespace WebApi.Controllers
         {
             int diff = (7 + (dt.DayOfWeek - startOfWeek)) % 7;
             return dt.AddDays(-1 * diff).Date;
-        }
-
-        /// <summary>
-        /// Обрезает информацию о заданном занятой переговорной
-        /// </summary>
-        /// <param name="day">Информация о занятой переговорной</param>
-        /// <param name="date">Дата дня</param>
-        /// <returns>Обрезанная информация</returns>
-        ShortInfoDay CutInfo(DayOfBusy day, DateTime date)
-        {
-            return new ShortInfoDay
-            {
-                IdRoom = day.RoomId,
-                TimeOfBusy = day.TimeOfBusy,
-                TimeOfFree = day.TimeOfFree,
-                Date = date,
-                CurrentDay = date == DateTime.Today,
-                CurrentWeek = IsCurrentWeek(date)
-            };
         }
 
         /// <summary>
